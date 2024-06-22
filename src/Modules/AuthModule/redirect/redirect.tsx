@@ -1,14 +1,18 @@
 import axios from 'axios';
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../../context/authContext';
 
 const Redirect = () => {
+    let {loginData,saveLoginData}=useContext(AuthContext)
+
     const { search } = useLocation()
     const navigate = useNavigate()
     const getToken = async ()=>{
         try{
             const response = await axios.get(`http://localhost:3000/v1/auth/google/redirect${search}`)
             localStorage.setItem('token',response.data.token)
+            saveLoginData()
             navigate('/')
         }catch(error){
             console.log("Error in getToken: ",error);
@@ -16,7 +20,9 @@ const Redirect = () => {
     }
 
     useEffect(()=>{
-        getToken()
+        if(!loginData){
+            getToken()
+        }
     },[])
 
     return (

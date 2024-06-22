@@ -16,7 +16,7 @@ export function AuthContextProvider(props){
             saveLoginData()
     }, [])
     return (
-        <AuthContext.Provider value={{loginData,saveLoginData}}>
+        <AuthContext.Provider value={{loginData,saveLoginData,setLoginData}}>
             {props.children}
         </AuthContext.Provider>
     )

@@ -15,10 +15,9 @@ import { useContext, useEffect, useState } from 'react';
 import { CssBaseline } from '@mui/material';
 import { AuthContext } from '../../../context/authContext';
 
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 const NavBar = () => {
 
-    let {loginData}=useContext(AuthContext)
+    let {loginData,setLoginData}=useContext(AuthContext)
 
 
     const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -43,6 +42,11 @@ const NavBar = () => {
             window.open(
                 `http://localhost:3000/v1/auth/google/`,'_self'
             )
+    }
+
+    const handleLogOut = ()=>{
+        setLoginData(null)
+        localStorage.removeItem('token')
     }
     useEffect(()=>{
         console.log('Login data updated:', loginData);
@@ -136,7 +140,7 @@ const NavBar = () => {
                         {loginData?<Box sx={{ flexGrow: 0 }}>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                                <Avatar alt="Remy Sharp" src={loginData.profileImg} />
                             </IconButton>
                         </Tooltip>
                         <Menu
@@ -155,11 +159,17 @@ const NavBar = () => {
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
                         >
-                            {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                    <Typography textAlign="center">{setting}</Typography>
+                                <MenuItem sx={{display:'flex',flexDirection:'column',alignContent:'start'}}>
+                                    <Typography textAlign="center">Account</Typography>
+                                    <Box sx={{display:'flex',flexDirection:'column'}}>
+                                    <Avatar alt="Remy Sharp" src={loginData.profileImg} />
+                                    <Typography textAlign="center">{loginData.displayName}</Typography>
+                                    <Typography textAlign="center">{loginData.email}</Typography>
+                                    </Box>
                                 </MenuItem>
-                            ))}
+                                <MenuItem onClick={handleCloseUserMenu} >
+                                    <Typography textAlign="center" onClick={handleLogOut} >Log Out</Typography>
+                                </MenuItem>
                         </Menu>
                     </Box>:<Box sx={{ flexGrow: 0 }}>
                         <button onClick={handleLogin}>Login with google</button>
