@@ -11,8 +11,9 @@ import { useState } from 'react';
 import { styled, Theme, CSSObject } from '@mui/material/styles';
 import MuiDrawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
+import { Link } from 'react-router-dom';
 
-const drawerWidth = 240;
+const drawerWidth = 160;
 
 const openedMixin = (theme: Theme): CSSObject => ({
     width: drawerWidth,
@@ -21,7 +22,8 @@ const openedMixin = (theme: Theme): CSSObject => ({
         duration: theme.transitions.duration.enteringScreen,
     }),
     overflowX: 'hidden',
-    top:'70px'
+    top:'70px',
+    
 });
 
 const closedMixin = (theme: Theme): CSSObject => ({
@@ -74,15 +76,15 @@ const SideBar = () => {
 
     return (
         <Box sx={{ display: 'flex' }}>
-            <Drawer variant="permanent" open={open}>
+            <Drawer variant="permanent" open={open} >
                 <DrawerHeader>
                     <IconButton onClick={handleDrawerOpen}>
-                    <MenuIcon />
+                    <MenuIcon sx={{color:'#023a4c'}}/>
                     </IconButton>
-                </DrawerHeader>
-                <Divider />
+                </DrawerHeader >
+                <Divider/>
                 <List>
-                        <ListItem disablePadding sx={{ display: 'block' }}>
+                        <ListItem disablePadding sx={{ display: 'block',color:'#023a4c'}} component={Link} to="/">
                             <ListItemButton
                                 sx={{
                                     minHeight: 48,
@@ -95,11 +97,33 @@ const SideBar = () => {
                                         minWidth: 0,
                                         mr: open ? 3 : 'auto',
                                         justifyContent: 'center',
+                                        color:'#023a4c'
                                     }}
                                 >
                                     <InboxIcon />
                                 </ListItemIcon>
-                                <ListItemText primary={'Home'} sx={{ opacity: open ? 1 : 0 }} />
+                                <ListItemText primary={'Home'} sx={{ opacity: open ? 1 : 0 }}  />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding sx={{ display: 'block',color:'#023a4c' }} component={Link} to="/projects">
+                            <ListItemButton
+                                sx={{
+                                    minHeight: 48,
+                                    justifyContent: open ? 'initial' : 'center',
+                                    px: 2.5,
+                                }}
+                            >
+                                <ListItemIcon
+                                    sx={{
+                                        minWidth: 0,
+                                        mr: open ? 3 : 'auto',
+                                        justifyContent: 'center',
+                                        color:'#023a4c'
+                                    }}
+                                >
+                                    <InboxIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={'Projetcs'} sx={{ opacity: open ? 1 : 0 }} />
                             </ListItemButton>
                         </ListItem>
                 </List>

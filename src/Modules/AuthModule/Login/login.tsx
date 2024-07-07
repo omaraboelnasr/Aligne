@@ -1,5 +1,3 @@
-import axios from "axios";
-
 
 const Login = () => {
     const REACT_APP_API_URL = 'http://localhost:3000'

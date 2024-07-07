@@ -52,7 +52,7 @@ const NavBar = () => {
         console.log('Login data updated:', loginData);
     },[])
     return (
-        <AppBar position="static">
+        <AppBar position="fixed" sx={{backgroundColor:'#023a4c'}}>
             <CssBaseline />
             <Container maxWidth="xl">
                 <Toolbar disableGutters>

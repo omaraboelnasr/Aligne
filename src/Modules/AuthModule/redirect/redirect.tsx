@@ -2,9 +2,11 @@ import axios from 'axios';
 import { useContext, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../context/authContext';
+import { ApiContext } from '../../../context/apiContext';
 
 const Redirect = () => {
     let {loginData,saveLoginData}=useContext(AuthContext)
+    const {authorization,setAuthorization}=useContext(ApiContext)
 
     const { search } = useLocation()
     const navigate = useNavigate()
@@ -12,6 +14,7 @@ const Redirect = () => {
         try{
             const response = await axios.get(`http://localhost:3000/v1/auth/google/redirect${search}`)
             localStorage.setItem('token',response.data.token)
+            setAuthorization(response.data.token)
             saveLoginData()
             navigate('/')
         }catch(error){
