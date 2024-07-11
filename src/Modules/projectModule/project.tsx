@@ -16,10 +16,14 @@ import EnhancedEncryptionIcon from '@mui/icons-material/EnhancedEncryption';
 import FilterVintageIcon from '@mui/icons-material/FilterVintage';
 import { ApiContext } from '../../context/apiContext';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import DeleteModal from '../SharedModule/DeleteModal/deleteModal';
+import CreateModal from '../SharedModule/CreateModal/createModal';
 
 const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: '#e6f3f861',
+    // backgroundColor: '#e6f3f861',
     padding: theme.spacing(2),
+    borderRadius: 15
 
 }));
 
@@ -35,6 +39,7 @@ const style = {
     p: 4,
 };
 
+
 const iconMapping = {
     'HomeIcon': HomeIcon,
     'BedtimeIcon': BedtimeIcon,
@@ -48,16 +53,20 @@ const iconMapping = {
 
 const Project = () => {
     const { baseUrl, authorization } = useContext(ApiContext)
-    const [open, setOpen] = useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const [projectId, setProjectId] = useState('')
+    const [project,setProject]=useState({})
     const [projectList, setProjectList] = useState([])
     const [userList, setUserList] = useState([])
-    const [mode,setMode]=useState('')
-    const { register, handleSubmit,setValue, control, formState: { errors } } = useForm();
-    const [colorValue, setColorValue] = useState('#ffffff')
-    const [iconValue, setIconValue] = useState("HomeIcon")
-    const [project,setProject]=useState({})
+    const [mode, setMode] = useState('')
+    const [open, setOpen] = useState(false);
+    const [openDelete, setOpenDelete] = useState(false);
+    const navigate = useNavigate()
+    const handleOpen = () => setOpen(true);
+    const handleOpenDelete = () => setOpenDelete(true);
+    const handleCloseDelete = () => {
+        setOpenDelete(false)
+    };
+    
     const getProjectList = async () => {
         try {
             const response = await axios.get(`${baseUrl}/project/`,
@@ -66,17 +75,9 @@ const Project = () => {
                 })
             setProjectList(response.data.data)
         } catch (error) {
-            console.log(error);
+            toast.error(error.response.data.message)
         }
     }
-
-    const handleChangeColor = (newValue) => {
-        setColorValue(newValue)
-    }
-
-    const handleChangeIcon = (event: SelectChangeEvent) => {
-        setIconValue(event.target.value);
-    };
 
     const getUsersList = async () => {
         try {
@@ -86,47 +87,39 @@ const Project = () => {
                 })
             setUserList(response.data.data)
         } catch (error) {
-            console.log(error);
+            toast.error(error.response.data.message)
         }
     }
 
-    const handelUpdateProject = (project)=>{
+    const handelUpdateProject = (project) => {
         setMode('update')
         handleOpen()
+        setProjectId(project._id)
         setProject(project)
-        setColorValue(project.color)
-        setIconValue(project.icon)
-        console.log(project);
     }
 
-    const onSubmit = async (data) => {
-        if(mode==='create'){
-            try {
-                const response = await axios.post(`${baseUrl}/project`, data,
-                    {
-                        headers: { authorization }
-                    })
-                handleClose()
-                getProjectList()
-                toast.success('Project add sucessfuly')
-            } catch (error) {
-                console.log(error);
-            }
-        }else{
-            try {
-                const response = await axios.patch(`${baseUrl}/project/${project._id}`, data,
-                    {
-                        headers: { authorization }
-                    })
-                handleClose()
-                getProjectList()
-                toast.success('Project updated sucessfuly')
-            } catch (error) {
-                console.log(error);
-            }
+    const openDeleteProject = (id) => {
+        handleOpenDelete()
+        setProjectId(id)
+    }
+
+    const handleDeleteProject = async () => {
+        try {
+            const response = await axios.delete(`${baseUrl}/project/${projectId}`,
+                {
+                    headers: { authorization }
+                })
+            getProjectList()
+            toast.success('Project deleted sucessfuly')
+            handleCloseDelete()
+        } catch (error) {
+            toast.error(error.response.data.message)
         }
-        
-    };
+    }
+
+    const handelViewProject = (id) => {
+        navigate(`/project/${id}`)
+    }
 
     useEffect(() => {
         getProjectList()
@@ -136,7 +129,8 @@ const Project = () => {
         <>
             <Grid sx={{ display: 'flex', justifyContent: 'space-between', margin: 5 }}>
                 <Box>
-                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#023a4c' }}>My Projects</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Projects</Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold', fontSize: 16 }}>View and manage your ongoing projects.</Typography>
                 </Box>
                 <Box>
                     <Button variant="contained" sx={{ fontWeight: 'bold' }} onClick={() => { handleOpen(); setMode('create'); }}>Add New Project</Button>
@@ -154,16 +148,37 @@ const Project = () => {
                                         {project.title}
                                     </Typography>
                                     <Divider />
-                                    <p>{project.description}</p>
-                                    <Typography variant="p" gutterBottom>
-                                        Project Color : <Brightness1Icon sx={{ color: project.color }} />
+                                    <Typography variant="body1" gutterBottom >
+                                        {project.description}
                                     </Typography>
-                                    <p>Project Icon : {IconComponent && <IconComponent />}</p>
-                                    <Divider />
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between',marginTop:2 }}>
-                                    <Button variant="outlined" onClick={()=>handelUpdateProject(project)}>Update Project</Button>
+                                    <Box sx={{ display: 'flex' }}>
+                                        <Typography variant="body1" gutterBottom >
+                                            Project Color :
+                                        </Typography>
+                                        <Typography variant="body1" gutterBottom >
+                                            <Brightness1Icon sx={{ color: project.color }} />
+                                        </Typography>
                                     </Box>
-                                    
+
+                                    <Box sx={{ display: 'flex' }}>
+                                        <Typography variant="body1" gutterBottom >
+                                            Project Icon :
+                                        </Typography>
+                                        <Typography variant="body1" gutterBottom >
+                                            {IconComponent && <IconComponent />}
+                                        </Typography>
+                                    </Box>
+
+                                    <Divider />
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
+                                        <Button variant="outlined" color="success" onClick={() => handelViewProject(project._id)}>
+                                            View
+                                        </Button>
+                                        <Button variant="outlined" onClick={() => handelUpdateProject(project)}>Update</Button>
+                                        <Button variant="outlined" color="error" onClick={() => openDeleteProject(project._id)}>
+                                            Delete
+                                        </Button>
+                                    </Box>
                                 </Item>
                             </Grid>
                         )
@@ -171,93 +186,8 @@ const Project = () => {
                 </Grid>
             </Box>
 
-            <Modal
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <Box sx={style}>
-                    <Typography id="modal-modal-title" variant="h6" component="h2" fontWeight={800} sx={{ color: '#023a4c' }}>
-                        {mode==='create'?'Create New Project':'Edit Project'}
-                        
-                    </Typography>
-                    <Box component="form" sx={{ padding: 2, width: '80%', margin: '0 auto', display: 'flex', flexDirection: 'column' }} onSubmit={handleSubmit(onSubmit)}>
-                        <Box sx={{ marginBottom: 3 }}>
-                            <TextField fullWidth id="standard-basic" label="Project Name" variant="outlined"
-                                {...register("title", { required: 'title Is Required', maxLength: { value: 30, message: 'title Must Not Exceed 30' } })}
-                            />
-                            {mode==='update'?setValue('title',project. title):''}
-                            {errors.title && <Typography variant="caption" color={'red'}>* {errors.title.message}</Typography>}
-                        </Box>
-
-                        <Box sx={{ marginBottom: 3 }}>
-                            <MuiColorInput {...register("color")} size="small" variant="outlined" label="Project Color" format="hex" value={colorValue} onChange={handleChangeColor} />
-                            {mode==='update'?setValue('color',project. color):''}
-                        </Box>
-
-                        <Box sx={{ marginBottom: 3, width: '25%' }}>
-                            <FormControl fullWidth>
-                                <InputLabel id="demo-simple-select-label">Select Icon</InputLabel>
-                                <Select
-                                    {...register("icon")}
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                    value={iconValue}
-                                    label="Select Icon"
-                                    onChange={handleChangeIcon}
-                                >
-                                    <MenuItem value={'HomeIcon'} selected={true} ><HomeIcon /></MenuItem>
-                                    <MenuItem value={'BedtimeIcon'}><BedtimeIcon /></MenuItem>
-                                    <MenuItem value={'BeenhereIcon'}><BeenhereIcon /></MenuItem>
-                                    <MenuItem value={'CloudIcon'}><CloudIcon /></MenuItem>
-                                    <MenuItem value={'EmojiObjectsIcon'}><EmojiObjectsIcon /></MenuItem>
-                                    <MenuItem value={'EnhancedEncryptionIcon'}><EnhancedEncryptionIcon /></MenuItem>
-                                    <MenuItem value={'FilterVintageIcon'}><FilterVintageIcon /></MenuItem>
-                                </Select>
-                                {mode==='update'?setValue('icon',project.icon):''}
-                            </FormControl>
-                        </Box>
-                        <Box sx={{ marginBottom: 3 }}>
-                            <TextField
-                                label="Description"
-                                multiline
-                                maxRows={4}
-                                variant="outlined"
-                                fullWidth
-                                {...register("description", { required: 'Description Is Required' })}
-                            />
-                            {mode==='update'?setValue('description',project.description):''}
-                            {errors.description && <Typography variant="caption" color={'red'}>* {errors.description.message}</Typography>}
-                        </Box>
-
-                        <Box sx={{ marginBottom: 3 }}>
-                            <Controller
-                                name="members"
-                                control={control}
-                                defaultValue={mode==='create'?[]:project.members}
-                                render={({ field }) => (
-                                    <Autocomplete
-                                        {...field}
-                                        multiple
-                                        id="size-small-outlined-multi"
-                                        size="small"
-                                        options={userList}
-                                        getOptionLabel={(option) => option.username}
-                                        onChange={(_, data) => field.onChange(data)}
-                                        renderInput={(params) => (
-                                            <TextField {...params} label="Add Members" />
-                                        )}
-                                    />
-                                )}
-                            />
-                        </Box>
-                        <Box sx={{ alignSelf: 'end' }}>
-                            <Button type="submit" variant="contained" sx={{ fontWeight: 'bold' }} onClick={handleOpen}>{mode==='create'?'Create':'Update'} Project</Button>
-                        </Box>
-                    </Box>
-                </Box>
-            </Modal>
+            <CreateModal open={open} setOpen={setOpen} mode={mode} userList={userList} project={project} projectId={projectId} getProjectList={getProjectList}/>
+            <DeleteModal openDelete={openDelete} handleCloseDelete={handleCloseDelete} handleDeleteProject={handleDeleteProject}/>
         </>
     );
 }

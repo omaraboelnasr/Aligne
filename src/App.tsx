@@ -9,6 +9,8 @@ import MasterLayOut from './Modules/MasterLayOut/MasterLayOut'
 import Project from './Modules/projectModule/project'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
+import ViewProject from './Modules/projectModule/viewProject'
+import Feature from './Modules/featureModule/feature'
 
 function App() {
   const routers = createBrowserRouter([
@@ -21,6 +23,8 @@ function App() {
         { path: "login", element: <Login /> },
         { path: "authRedirect", element: <Redirect/> },
         { path: "projects", element: <Project/> },
+        { path: "project/:id", element: <ViewProject/> },
+        { path: "feature/:id", element: <Feature/> },
       ]
     }
   ])

@@ -4,22 +4,22 @@ import SideBar from '../SharedModule/SideBar/sideBar';
 import NavBar from '../SharedModule/NavBar/navBar';
 const MasterLayOut = () => {
     const theme = useTheme();
-  const isMediumScreen = useMediaQuery(theme.breakpoints.down('xl'));
+    const isMediumScreen = useMediaQuery(theme.breakpoints.down('xl'));
     return (
-        <Box sx={{backgroundColor:'#e6f3f861',minHeight: '100vh',display: 'flex', flexDirection: 'column' }}>
-        <Container maxWidth="xl" sx={{ flexGrow: 1 ,backgroundColor:'white',display: 'flex', flexDirection: 'column'  }} >
-            <Grid  container direction="column">
-                <Grid item>
-                    <NavBar />
-                </Grid>
-                <Grid container={isMediumScreen}  >
-                    <SideBar />
-                    <Grid  sx={{marginTop:20}}>
-                        <Outlet />
+        <Box sx={{ backgroundColor: '#e6f3f861', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <Container maxWidth="xl" sx={{ flexGrow: 1,  display: 'flex', flexDirection: 'column' }} >
+                <Grid container direction="column">
+                    <Grid item>
+                        <NavBar />
+                    </Grid>
+                    <Grid container={isMediumScreen}  >
+                        <SideBar />
+                        <Grid sx={{ marginTop: 20 }}>
+                            <Outlet />
+                        </Grid>
                     </Grid>
                 </Grid>
-            </Grid>
-        </Container>
+            </Container>
         </Box>
     )
 }
